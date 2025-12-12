@@ -98,7 +98,6 @@
             transform: scale(1);
         }
 
-        /* Loading Screen */
         #loading {
             display: none;
             animation: popIn 1s ease forwards;
@@ -140,6 +139,8 @@
 <body>
 
     <div class="title">🔮 See Your Future</div>
+
+    <!-- FORM -->
     <div class="container" id="formBox">
         <h2>Enter Your Info</h2>
 
@@ -155,15 +156,20 @@
 
         <button onclick="showFuture()">Submit</button>
     </div>
+
+    <!-- LOADING ANIMATION -->
     <div class="container" id="loading">
-        <h2>prediciting Your Future… 🔍</h2>
+        <h2>Predicting Your Future… 🔍</h2>
         <div class="loader"></div>
         <p>Please wait...</p>
     </div>
-	 <div class="container" id="result">
+
+    <!-- RESULT -->
+    <div class="container" id="result">
         <h2 id="message"></h2>
 
-        <video id="video" controls autoplay loop>
+        <!-- UPDATED for mobile autoplay -->
+        <video id="video" controls autoplay loop muted playsinline>
             <source src="future.mp4" type="video/mp4">
         </video>
     </div>
@@ -178,13 +184,13 @@
             alert("Please fill all details!");
             return;
         }
-       document.getElementById("formBox").style.display = "none";
+
+        document.getElementById("formBox").style.display = "none";
         document.getElementById("loading").style.display = "block";
+
         setTimeout(() => {
             document.getElementById("loading").style.display = "none";
             document.getElementById("result").style.display = "block";
-
-           
 
             document.getElementById("video").play();
         }, 3000);
@@ -193,4 +199,3 @@
 
 </body>
 </html>
-
