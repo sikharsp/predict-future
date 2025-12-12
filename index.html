@@ -4,186 +4,194 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Future Predictor</title>
-
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
-            font-family: Poppins, sans-serif;
+            font-family: 'Poppins', sans-serif;
             background: radial-gradient(circle at top, #1e3c72, #2a5298);
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             overflow: hidden;
             color: #fff;
+            padding: 20px;
+            box-sizing: border-box;
         }
-
         .title {
-            position: absolute;
-            top: 40px;
-            font-size: 40px;
+            font-size: 36px;
             font-weight: 700;
             text-align: center;
-            width: 100%;
+            margin-bottom: 30px;
             animation: glow 2s infinite alternate ease-in-out;
             letter-spacing: 2px;
         }
-
         @keyframes glow {
             from { text-shadow: 0 0 10px #fff; }
             to { text-shadow: 0 0 25px cyan, 0 0 45px #00eaff; }
         }
-
         .container {
             background: rgba(255, 255, 255, 0.15);
-            padding: 40px;
-            width: 350px;
+            padding: 30px;
+            width: 100%;
+            max-width: 380px;
             border-radius: 20px;
             backdrop-filter: blur(12px);
-            animation: popIn 1.2s ease forwards;
             box-shadow: 0 0 40px rgba(0,0,0,0.4);
-            transform: scale(0.8);
             text-align: center;
         }
-
-        @keyframes popIn {
-            from { opacity: 0; transform: scale(0.6); }
-            to { opacity: 1; transform: scale(1); }
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
         }
-
         input, select {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             margin: 12px 0;
             border-radius: 10px;
             border: none;
             outline: none;
-            font-size: 15px;
-            transition: 0.3s;
+            font-size: 16px;
+            box-sizing: border-box;
         }
-
         input:focus, select:focus {
-            box-shadow: 0 0 12px #00eaff;
+            box-shadow: 0 0 15px #00eaff;
         }
-
         button {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             background: linear-gradient(135deg, #00eaff, #0072ff);
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             color: #fff;
-            font-size: 17px;
-            margin-top: 10px;
+            font-size: 18px;
+            margin-top: 15px;
             transition: 0.3s;
             position: relative;
             overflow: hidden;
         }
-
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,114,255,0.4);
+        }
         button::after {
             content: "";
             position: absolute;
             width: 120%;
             height: 120%;
             background: rgba(255,255,255,0.3);
-            top: -10px;
-            left: -10px;
-            transform: scale(0);
+            top: -50%;
+            left: -50%;
             border-radius: 50%;
-            transition: 0.5s ease;
+            transform: scale(0);
+            transition: 0.6s;
         }
-
-        button:hover::after {
+        button:active::after {
             transform: scale(1);
         }
-
         #loading {
             display: none;
-            animation: popIn 1s ease forwards;
         }
-
         .loader {
-            margin: 20px auto;
-            width: 35px;
-            height: 35px;
-            border: 5px solid #fff;
+            margin: 30px auto;
+            width: 50px;
+            height: 50px;
+            border: 6px solid #fff;
             border-top-color: transparent;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-
         @keyframes spin {
-            from { transform: rotate(0); }
             to { transform: rotate(360deg); }
         }
-
         #result {
             display: none;
-            animation: slideIn 1s ease forwards;
         }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(50px); }
-            to { opacity: 1; transform: translateY(0); }
+        #message {
+            font-size: 20px;
+            margin-bottom: 20px;
+            line-height: 1.5;
         }
-
         video {
             margin-top: 20px;
             width: 100%;
-            border-radius: 10px;
-            box-shadow: 0 0 25px rgba(0,0,0,0.7);
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.6);
+        }
+        @media (min-width: 600px) {
+            .title {
+                font-size: 48px;
+            }
+            .container {
+                padding: 40px;
+            }
         }
     </style>
 </head>
 <body>
-
     <div class="title">🔮 See Your Future</div>
 
     <!-- FORM -->
     <div class="container" id="formBox">
-        <h2>Enter Your Info</h2>
-
+        <h2>Enter Your Details</h2>
         <input type="text" id="fname" placeholder="First Name" required>
         <input type="text" id="lname" placeholder="Last Name" required>
-
-        <select id="faculty">
-            <option value="">Select Faculty</option>
+        <select id="faculty" required>
+            <option value="" disabled selected>Select Faculty</option>
             <option value="BCA">BCA</option>
             <option value="BBS">BBS</option>
             <option value="BED">BED</option>
         </select>
-
-        <button onclick="showFuture()">Submit</button>
+        <button onclick="showFuture()">Reveal My Future 🔮</button>
     </div>
 
-    <!-- LOADING ANIMATION -->
+    <!-- LOADING -->
     <div class="container" id="loading">
         <h2>Predicting Your Future… 🔍</h2>
         <div class="loader"></div>
-        <p>Please wait...</p>
+        <p>The crystal ball is gazing...</p>
     </div>
 
     <!-- RESULT -->
     <div class="container" id="result">
-        <h2 id="message"></h2>
-
-        <!-- UPDATED for mobile autoplay -->
-        <video id="video" controls autoplay loop muted playsinline>
+        <h2>Your Future Awaits!</h2>
+        <p id="message"></p>
+        <video id="video" controls loop playsinline>
             <source src="future.mp4" type="video/mp4">
+            Your browser does not support the video tag.
         </video>
+        <p style="margin-top: 15px; font-size: 14px;">(Tap play to hear the mystical sounds if available)</p>
     </div>
 
 <script>
+    const funnyMessages = [
+        "You will become a billionaire tech mogul and buy your own spaceship! 🚀",
+        "Fame awaits! You'll star in blockbuster movies and win awards. 🎥🏆",
+        "You'll discover a hidden talent and become a world-famous musician. 🎸",
+        "Adventure calls! You'll travel the world and uncover ancient treasures. 🗺️",
+        "Love is in your future – a fairytale romance with your soulmate. ❤️",
+        "You'll invent the next big app and change the world forever. 💡",
+        "Luxury life ahead: Private jets, yachts, and endless vacations! ✈️🛥️",
+        "You'll win the lottery... multiple times! Pure luck follows you. 💰",
+        "A career breakthrough: CEO of a top company by age 30. 👔",
+        "You'll live to 120, healthy and happy with your dream family. 🏡"
+    ];
+
     function showFuture() {
-        const fname = document.getElementById("fname").value;
-        const lname = document.getElementById("lname").value;
+        const fname = document.getElementById("fname").value.trim();
+        const lname = document.getElementById("lname").value.trim();
         const faculty = document.getElementById("faculty").value;
 
         if (!fname || !lname || !faculty) {
-            alert("Please fill all details!");
+            alert("Please fill in all details! ✨");
             return;
         }
+
+        const fullName = fname + " " + lname;
+        const randomFuture = funnyMessages[Math.floor(Math.random() * funnyMessages.length)];
 
         document.getElementById("formBox").style.display = "none";
         document.getElementById("loading").style.display = "block";
@@ -191,11 +199,12 @@
         setTimeout(() => {
             document.getElementById("loading").style.display = "none";
             document.getElementById("result").style.display = "block";
-
-            document.getElementById("video").play();
-        }, 3000);
+            
+            
+            const video = document.getElementById("video");
+            video.play().catch(() => {}); // Auto-play (with sound if video has it)
+        }, 3500);
     }
 </script>
-
 </body>
 </html>
