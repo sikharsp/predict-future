@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Future Predictor</title>
+    <title>Interactive Tarot Reading</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -15,7 +15,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
+            overflow-x: hidden;
             color: #fff;
             padding: 20px;
             box-sizing: border-box;
@@ -36,7 +36,7 @@
             background: rgba(255, 255, 255, 0.15);
             padding: 30px;
             width: 100%;
-            max-width: 380px;
+            max-width: 420px;
             border-radius: 20px;
             backdrop-filter: blur(12px);
             box-shadow: 0 0 40px rgba(0,0,0,0.4);
@@ -70,29 +70,12 @@
             font-size: 18px;
             margin-top: 15px;
             transition: 0.3s;
-            position: relative;
-            overflow: hidden;
         }
         button:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(0,114,255,0.4);
         }
-        button::after {
-            content: "";
-            position: absolute;
-            width: 120%;
-            height: 120%;
-            background: rgba(255,255,255,0.3);
-            top: -50%;
-            left: -50%;
-            border-radius: 50%;
-            transform: scale(0);
-            transition: 0.6s;
-        }
-        button:active::after {
-            transform: scale(1);
-        }
-        #loading {
+        #loading, #selection {
             display: none;
         }
         .loader {
@@ -111,9 +94,61 @@
             display: none;
         }
         #message {
-            font-size: 20px;
+            font-size: 18px;
             margin-bottom: 20px;
-            line-height: 1.5;
+            line-height: 1.6;
+        }
+        .deck, .selected-cards {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .card {
+            width: 100px;
+            height: 160px;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            border: 3px solid #00eaff;
+            border-radius: 12px;
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.7);
+            cursor: pointer;
+            transition: transform 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: "🔮";
+            font-size: 60px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.3;
+        }
+        .card:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 35px rgba(0, 255, 255, 1);
+        }
+        .card .front {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            opacity: 0;
+            transform: rotateY(180deg);
+            transition: opacity 0.6s, transform 0.6s;
+            border-radius: 12px;
+        }
+        .card.flipped .front {
+            opacity: 1;
+            transform: rotateY(0);
+        }
+        .front img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
         }
         video {
             margin-top: 20px;
@@ -127,12 +162,20 @@
             }
             .container {
                 padding: 40px;
+                max-width: 550px;
+            }
+            .card {
+                width: 120px;
+                height: 190px;
+            }
+            .card::before {
+                font-size: 80px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="title">🔮 See Your Future</div>
+    <div class="title">🔮 Interactive Tarot Reading</div>
 
     <!-- FORM -->
     <div class="container" id="formBox">
@@ -145,65 +188,160 @@
             <option value="BBS">BBS</option>
             <option value="BED">BED</option>
         </select>
-        <button onclick="showFuture()">Reveal My Future 🔮</button>
+        <button onclick="startReading()">Begin Tarot Reading 🔮</button>
     </div>
 
     <!-- LOADING -->
     <div class="container" id="loading">
-        <h2>Predicting Your Future… 🔍</h2>
+        <h2>Shuffling the Deck… 🔍</h2>
         <div class="loader"></div>
-        <p>The crystal ball is gazing...</p>
+        <p>The cards are being prepared for you...</p>
+    </div>
+
+    <!-- CARD SELECTION -->
+    <div class="container" id="selection">
+        <h2>Choose 3 Cards</h2>
+        <p>Tap on three cards to reveal your reading</p>
+        <div class="deck" id="deck"></div>
+        <div class="selected-cards" id="selectedCards"></div>
     </div>
 
     <!-- RESULT -->
     <div class="container" id="result">
-        <h2>Your Future Awaits!</h2>
+        <h2>Your Tarot Reading</h2>
         <p id="message"></p>
+        <div class="selected-cards" id="finalCards"></div>
         <video id="video" controls loop playsinline>
-            <source src="future.mp4" type="video/mp4">
+            <!-- Updated to a reliable, hotlink-friendly mystical tarot video from Pexels -->
+            <source src="future.mp4">
             Your browser does not support the video tag.
         </video>
-        <p style="margin-top: 15px; font-size: 14px;">(Tap play to hear the mystical sounds if available)</p>
+        <p style="margin-top: 15px; font-size: 14px;">Mystical tarot ambiance ✨</p>
     </div>
 
 <script>
-    const funnyMessages = [
-        "You will become a billionaire tech mogul and buy your own spaceship! 🚀",
-        "Fame awaits! You'll star in blockbuster movies and win awards. 🎥🏆",
-        "You'll discover a hidden talent and become a world-famous musician. 🎸",
-        "Adventure calls! You'll travel the world and uncover ancient treasures. 🗺️",
-        "Love is in your future – a fairytale romance with your soulmate. ❤️",
-        "You'll invent the next big app and change the world forever. 💡",
-        "Luxury life ahead: Private jets, yachts, and endless vacations! ✈️🛥️",
-        "You'll win the lottery... multiple times! Pure luck follows you. 💰",
-        "A career breakthrough: CEO of a top company by age 30. 👔",
-        "You'll live to 120, healthy and happy with your dream family. 🏡"
+    const majorArcana = [
+        { name: "The Fool", meaning: "New beginnings, adventure, and limitless potential! 🌟", img: "https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg" },
+        { name: "The Magician", meaning: "You have the power to manifest your dreams! ✨", img: "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_01_Magician.jpg" },
+        { name: "The High Priestess", meaning: "Trust your intuition and inner wisdom. 🌙", img: "https://upload.wikimedia.org/wikipedia/commons/8/88/RWS_Tarot_02_High_Priestess.jpg" },
+        { name: "The Empress", meaning: "Abundance, creativity, and nurturing energy. 🌸", img: "https://upload.wikimedia.org/wikipedia/commons/d/d2/RWS_Tarot_03_Empress.jpg" },
+        { name: "The Emperor", meaning: "Stability, authority, and leadership. 👑", img: "https://upload.wikimedia.org/wikipedia/commons/c/c3/RWS_Tarot_04_Emperor.jpg" },
+        { name: "The Hierophant", meaning: "Tradition, conformity, and spiritual guidance. 📜", img: "https://upload.wikimedia.org/wikipedia/commons/4/4d/RWS_Tarot_05_Hierophant.jpg" },
+        { name: "The Lovers", meaning: "Harmony, deep connections, and love. ❤️", img: "https://upload.wikimedia.org/wikipedia/commons/3/3a/TheLovers.jpg" },
+        { name: "The Chariot", meaning: "Victory through determination! 🚀", img: "https://upload.wikimedia.org/wikipedia/commons/9/9b/RWS_Tarot_07_Chariot.jpg" },
+        { name: "Strength", meaning: "Inner courage and compassion. 🦁", img: "https://upload.wikimedia.org/wikipedia/commons/f/f5/RWS_Tarot_08_Strength.jpg" },
+        { name: "The Hermit", meaning: "Seek inner truth and wisdom. 🔦", img: "https://upload.wikimedia.org/wikipedia/commons/4/4d/RWS_Tarot_09_Hermit.jpg" },
+        { name: "Wheel of Fortune", meaning: "Positive change and good luck! 🍀", img: "https://upload.wikimedia.org/wikipedia/commons/3/3c/RWS_Tarot_10_Wheel_of_Fortune.jpg" },
+        { name: "Justice", meaning: "Fairness, truth, and balance. ⚖️", img: "https://upload.wikimedia.org/wikipedia/commons/e/e0/RWS_Tarot_11_Justice.jpg" },
+        { name: "The Hanged Man", meaning: "New perspective and growth. 🙃", img: "https://upload.wikimedia.org/wikipedia/commons/2/2b/RWS_Tarot_12_Hanged_Man.jpg" },
+        { name: "Death", meaning: "Transformation and new beginnings. 🦋", img: "https://upload.wikimedia.org/wikipedia/commons/d/d7/RWS_Tarot_13_Death.jpg" },
+        { name: "Temperance", meaning: "Balance and harmony. 🌈", img: "https://upload.wikimedia.org/wikipedia/commons/f/f8/RWS_Tarot_14_Temperance.jpg" },
+        { name: "The Devil", meaning: "Break free from limitations. 🔥", img: "https://upload.wikimedia.org/wikipedia/commons/5/55/RWS_Tarot_15_Devil.jpg" },
+        { name: "The Tower", meaning: "Sudden change for the better. 🏰", img: "https://upload.wikimedia.org/wikipedia/commons/5/53/RWS_Tarot_16_Tower.jpg" },
+        { name: "The Star", meaning: "Hope, inspiration, and wishes come true! ⭐", img: "https://upload.wikimedia.org/wikipedia/commons/d/db/RWS_Tarot_17_Star.jpg" },
+        { name: "The Moon", meaning: "Trust your path to clarity. 🌕", img: "https://upload.wikimedia.org/wikipedia/commons/7/7f/RWS_Tarot_18_Moon.jpg" },
+        { name: "The Sun", meaning: "Joy, success, and vitality! ☀️", img: "https://upload.wikimedia.org/wikipedia/commons/1/17/RWS_Tarot_19_Sun.jpg" },
+        { name: "Judgement", meaning: "Awakening and renewal. 📯", img: "https://upload.wikimedia.org/wikipedia/commons/d/dd/RWS_Tarot_20_Judgement.jpg" },
+        { name: "The World", meaning: "Completion, fulfillment, and triumph! 🌍", img: "https://upload.wikimedia.org/wikipedia/commons/f/ff/RWS_Tarot_21_World.jpg" }
     ];
 
-    function showFuture() {
+    const funnyMessages = [
+        "You'll become a billionaire tech mogul! 🚀",
+        "Fame and blockbuster movies await! 🎥🏆",
+        "World-famous musician in your future! 🎸",
+        "Adventures and hidden treasures! 🗺️",
+        "Fairytale romance with your soulmate! ❤️",
+        "Invent the next big thing! 💡",
+        "Luxury life with jets and yachts! ✈️🛥️",
+        "Win the lottery multiple times! 💰",
+        "CEO by age 30! 👔",
+        "Long, happy life with your dream family! 🏡"
+    ];
+
+    let selected = [];
+    let fullName, faculty;
+
+    function startReading() {
         const fname = document.getElementById("fname").value.trim();
         const lname = document.getElementById("lname").value.trim();
-        const faculty = document.getElementById("faculty").value;
+        const fac = document.getElementById("faculty").value;
 
-        if (!fname || !lname || !faculty) {
+        if (!fname || !lname || !fac) {
             alert("Please fill in all details! ✨");
             return;
         }
 
-        const fullName = fname + " " + lname;
-        const randomFuture = funnyMessages[Math.floor(Math.random() * funnyMessages.length)];
+        fullName = fname + " " + lname;
+        faculty = fac;
 
         document.getElementById("formBox").style.display = "none";
         document.getElementById("loading").style.display = "block";
 
         setTimeout(() => {
             document.getElementById("loading").style.display = "none";
-            document.getElementById("result").style.display = "block";
-            
-            
-            const video = document.getElementById("video");
-            video.play().catch(() => {}); // Auto-play (with sound if video has it)
+            document.getElementById("selection").style.display = "block";
+            setupDeck();
         }, 3500);
+    }
+
+    function setupDeck() {
+        const deckDiv = document.getElementById("deck");
+        deckDiv.innerHTML = "";
+        selected = [];
+        document.getElementById("selectedCards").innerHTML = "";
+
+        const shuffled = [...majorArcana].sort(() => 0.5 - Math.random());
+        const deckCards = shuffled.slice(0, 9);
+
+        deckCards.forEach((card) => {
+            const cardEl = document.createElement("div");
+            cardEl.className = "card";
+            cardEl.innerHTML = `<div class="front"><img src="${card.img}" alt="${card.name}"></div>`;
+            cardEl.onclick = () => selectCard(cardEl, card);
+            deckDiv.appendChild(cardEl);
+        });
+    }
+
+    function selectCard(el, card) {
+        if (selected.length >= 3 || el.classList.contains("flipped")) return;
+
+        el.classList.add("flipped");
+        selected.push(card);
+
+        const selectedDiv = document.getElementById("selectedCards");
+        const clone = el.cloneNode(true);
+        clone.onclick = null;
+        selectedDiv.appendChild(clone);
+
+        if (selected.length === 3) {
+            setTimeout(showResult, 1500);
+        }
+    }
+
+    function showResult() {
+        document.getElementById("selection").style.display = "none";
+        document.getElementById("result").style.display = "block";
+
+        let readingText = `Dear ${fullName} from ${faculty},\n\nYour three-card reading:\n\n`;
+        const finalCardsDiv = document.getElementById("finalCards");
+        finalCardsDiv.innerHTML = "";
+
+        selected.forEach((card, i) => {
+            readingText += `${i+1}. ${card.name}: ${card.meaning}\n\n`;
+
+            const cardEl = document.createElement("div");
+            cardEl.className = "card flipped";
+            cardEl.innerHTML = `<div class="front"><img src="${card.img}" alt="${card.name}"></div>`;
+            finalCardsDiv.appendChild(cardEl);
+        });
+
+        const overall = funnyMessages[Math.floor(Math.random() * funnyMessages.length)];
+        readingText += `Overall, the cards predict: ${overall}`;
+
+        document.getElementById("message").textContent = readingText;
+
+        const video = document.getElementById("video");
+        video.play().catch(() => {});
     }
 </script>
 </body>
