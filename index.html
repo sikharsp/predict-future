@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Future Reading</title>
+    <title>Interactive Oracle Reading</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -36,7 +36,7 @@
             background: rgba(255, 255, 255, 0.15);
             padding: 30px;
             width: 100%;
-            max-width: 420px;
+            max-width: 600px;
             border-radius: 20px;
             backdrop-filter: blur(12px);
             box-shadow: 0 0 40px rgba(0,0,0,0.4);
@@ -99,15 +99,14 @@
             line-height: 1.6;
         }
         .deck, .selected-cards {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 20px;
             margin: 30px 0;
+            justify-content: center;
         }
         .card {
-            width: 100px;
-            height: 160px;
+            aspect-ratio: 2 / 3;
             background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
             border: 3px solid #00eaff;
             border-radius: 12px;
@@ -119,7 +118,7 @@
         }
         .card::before {
             content: "🔮";
-            font-size: 60px;
+            font-size: 50px;
             position: absolute;
             top: 50%;
             left: 50%;
@@ -127,24 +126,10 @@
             opacity: 0.3;
         }
         .card:hover {
-            transform: scale(1.1);
+            transform: scale(1.05);
             box-shadow: 0 0 35px rgba(0, 255, 255, 1);
         }
-        .card .front {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            opacity: 0;
-            transform: rotateY(180deg);
-            transition: opacity 0.6s, transform 0.6s;
-            border-radius: 12px;
-        }
-        .card.flipped .front {
-            opacity: 1;
-            transform: rotateY(0);
-        }
-        .front img {
+        .card img {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -162,20 +147,16 @@
             }
             .container {
                 padding: 40px;
-                max-width: 550px;
+                max-width: 800px;
             }
-            .card {
-                width: 120px;
-                height: 190px;
-            }
-            .card::before {
-                font-size: 80px;
+            .deck, .selected-cards {
+                grid-template-columns: repeat(3, 1fr);
             }
         }
     </style>
 </head>
 <body>
-    <div class="title">🔮 Interactive Future Reading</div>
+    <div class="title">🔮 Interactive Oracle Reading</div>
 
     <!-- FORM -->
     <div class="container" id="formBox">
@@ -188,7 +169,7 @@
             <option value="BBS">BBS</option>
             <option value="BED">BED</option>
         </select>
-        <button onclick="startReading()">Begin Tarot Reading 🔮</button>
+        <button onclick="startReading()">Begin Oracle Reading 🔮</button>
     </div>
 
     <!-- LOADING -->
@@ -208,25 +189,24 @@
 
     <!-- RESULT -->
     <div class="container" id="result">
-        <h2>Your Tarot Reading</h2>
+        <h2>Your Oracle Reading</h2>
         <p id="message"></p>
         <div class="selected-cards" id="finalCards"></div>
-        <video id="video" loop muted playsinline preload="auto">
-            <!-- Reliable Pexels direct link - mystical tarot reading with hands and cards (silent for reliable mobile autoplay) -->
+        <video id="video" loop playsinline controls preload="auto">
             <source src="future.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
-        <p style="margin-top: 15px; font-size: 14px;">Mystical tarot ambiance ✨</p>
+        <p style="margin-top: 15px; font-size: 14px;">Mystical oracle ambiance with sound ✨ (Tap speaker to control volume)</p>
     </div>
 
 <script>
-    const majorArcana = [
+const majorArcana = [
         { name: "The Fool", meaning: "New beginnings, adventure, and limitless potential! 🌟", img: "https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg" },
         { name: "The Magician", meaning: "You have the power to manifest your dreams! ✨", img: "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_01_Magician.jpg" },
         { name: "The High Priestess", meaning: "Trust your intuition and inner wisdom. 🌙", img: "https://upload.wikimedia.org/wikipedia/commons/8/88/RWS_Tarot_02_High_Priestess.jpg" },
         { name: "The Empress", meaning: "Abundance, creativity, and nurturing energy. 🌸", img: "https://upload.wikimedia.org/wikipedia/commons/d/d2/RWS_Tarot_03_Empress.jpg" },
         { name: "The Emperor", meaning: "Stability, authority, and leadership. 👑", img: "https://upload.wikimedia.org/wikipedia/commons/c/c3/RWS_Tarot_04_Emperor.jpg" },
-        { name: "The Hierophant", meaning: "Tradition, conformity, and spiritual guidance. 📜", img: "https://upload.wikimedia.org/wikipedia/commons/4/4d/RWS_Tarot_05_Hierophant.jpg" },
+        { name: "The Hierophant", meaning: "Tradition, spiritual guidance, and wisdom from teachers. 📜", img: "https://c8.alamy.com/comp/2T3P775/the-hierophant-individual-tarot-card-2T3P775.jpg" },
         { name: "The Lovers", meaning: "Harmony, deep connections, and love. ❤️", img: "https://upload.wikimedia.org/wikipedia/commons/3/3a/TheLovers.jpg" },
         { name: "The Chariot", meaning: "Victory through determination! 🚀", img: "https://upload.wikimedia.org/wikipedia/commons/9/9b/RWS_Tarot_07_Chariot.jpg" },
         { name: "Strength", meaning: "Inner courage and compassion. 🦁", img: "https://upload.wikimedia.org/wikipedia/commons/f/f5/RWS_Tarot_08_Strength.jpg" },
@@ -296,16 +276,15 @@
         deckCards.forEach((card) => {
             const cardEl = document.createElement("div");
             cardEl.className = "card";
-            cardEl.innerHTML = `<div class="front"><img src="${card.img}" alt="${card.name}"></div>`;
+            cardEl.innerHTML = `<img src="${card.img}" alt="${card.name}">`;
             cardEl.onclick = () => selectCard(cardEl, card);
             deckDiv.appendChild(cardEl);
         });
     }
 
     function selectCard(el, card) {
-        if (selected.length >= 3 || el.classList.contains("flipped")) return;
+        if (selected.length >= 3 || selected.includes(card)) return;
 
-        el.classList.add("flipped");
         selected.push(card);
 
         const selectedDiv = document.getElementById("selectedCards");
@@ -322,7 +301,7 @@
         document.getElementById("selection").style.display = "none";
         document.getElementById("result").style.display = "block";
 
-        let readingText = `Dear ${fullName} from ${faculty},\n\nYour three-card reading:\n\n`;
+        let readingText = `Dear ${fullName} from ${faculty},\n\nYour three-card oracle reading:\n\n`;
         const finalCardsDiv = document.getElementById("finalCards");
         finalCardsDiv.innerHTML = "";
 
@@ -330,8 +309,8 @@
             readingText += `${i+1}. ${card.name}: ${card.meaning}\n\n`;
 
             const cardEl = document.createElement("div");
-            cardEl.className = "card flipped";
-            cardEl.innerHTML = `<div class="front"><img src="${card.img}" alt="${card.name}"></div>`;
+            cardEl.className = "card";
+            cardEl.innerHTML = `<img src="${card.img}" alt="${card.name}">`;
             finalCardsDiv.appendChild(cardEl);
         });
 
@@ -340,11 +319,9 @@
 
         document.getElementById("message").textContent = readingText;
 
-        // Trigger autoplay after user interaction (card selections)
         const video = document.getElementById("video");
-        video.play().catch(error => {
-            console.log("Autoplay was prevented:", error);
-        });
+        video.muted = false;
+        video.play().catch(() => {});
     }
 </script>
 </body>
