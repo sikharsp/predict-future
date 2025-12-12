@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Tarot Reading</title>
+    <title>Interactive Future Reading</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -175,7 +175,7 @@
     </style>
 </head>
 <body>
-    <div class="title">🔮 Interactive Tarot Reading</div>
+    <div class="title">🔮 Interactive Future Reading</div>
 
     <!-- FORM -->
     <div class="container" id="formBox">
@@ -211,9 +211,9 @@
         <h2>Your Tarot Reading</h2>
         <p id="message"></p>
         <div class="selected-cards" id="finalCards"></div>
-        <video id="video" controls loop playsinline>
-            <!-- Updated to a reliable, hotlink-friendly mystical tarot video from Pexels -->
-            <source src="future.mp4">
+        <video id="video" loop muted playsinline preload="auto">
+            <!-- Reliable Pexels direct link - mystical tarot reading with hands and cards (silent for reliable mobile autoplay) -->
+            <source src="future.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
         <p style="margin-top: 15px; font-size: 14px;">Mystical tarot ambiance ✨</p>
@@ -340,8 +340,11 @@
 
         document.getElementById("message").textContent = readingText;
 
+        // Trigger autoplay after user interaction (card selections)
         const video = document.getElementById("video");
-        video.play().catch(() => {});
+        video.play().catch(error => {
+            console.log("Autoplay was prevented:", error);
+        });
     }
 </script>
 </body>
